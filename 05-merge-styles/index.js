@@ -13,6 +13,7 @@ fs.readdir(folderWithStyles, {withFileTypes: true}, (err, files) => {
         if (err) {
           throw new Error(err);
         } else {
+          console.log(i);
           writeStream.write(data + '\n');
         }
       })
