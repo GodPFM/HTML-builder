@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const readdir = require("fs");
 
 let pathToFolder = path.resolve(__dirname, 'secret-folder');
 console.log(pathToFolder);
