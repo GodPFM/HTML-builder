@@ -4,6 +4,12 @@ const path = require('path');
 const pathOfNewFolder = path.resolve(__dirname,'files-copy');
 const pathOfCopyFolder = path.resolve(__dirname, 'files');
 
+fs.mkdir(pathOfNewFolder,{recursive: true}, (err) => {
+  if (err) {
+    throw new Error(err);
+  }
+});
+
 deleteFiles(pathOfNewFolder);
 
 function deleteFiles(pathOfAssets) {
@@ -11,18 +17,9 @@ function deleteFiles(pathOfAssets) {
     for (let item of files) {
       await fs.promises.rm(path.resolve(pathOfAssets, item.name),{recursive:true, force: true}, (err) =>{});
     }
-    if (files.length === 0) {
-      fs.rmdir(pathOfAssets, (err) => {})
-    }
     copyAssets(pathOfCopyFolder, pathOfNewFolder);
   });
 }
-
-fs.mkdir(pathOfNewFolder,{recursive: true}, (err) => {
-  if (err) {
-    throw new Error(err);
-  }
-});
 
 function copyAssets(pathOfAssets, pathOfProjectAssets) {
   fs.readdir(pathOfAssets, {withFileTypes: true}, (err, files) => {
