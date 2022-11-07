@@ -6,19 +6,11 @@ const assetsPath = path.resolve(__dirname,'assets');
 const componentsPath = path.resolve(__dirname,'components');
 const stylesPath = path.resolve(__dirname,'styles');
 
-deleteFiles(path.resolve(projectPath, 'assets'));
-
-function deleteFiles(pathOfAssets) {
-  fs.readdir(pathOfAssets,{withFileTypes: true}, async (err, files) => {
-    for (let item of files) {
-      await fs.promises.rm(path.resolve(pathOfAssets, item.name),{recursive:true, force: true}, (err) =>{});
-    }
-    if (files.length === 0) {
-      fs.rmdir(pathOfAssets, (err) => {})
-    }
-    copyAssets(assetsPath, path.resolve(projectPath, 'assets'));
-  });
-}
+fs.mkdir(projectPath,{recursive: true}, (err) => {
+  if (err) {
+    throw new Error(err);
+  }
+});
 
 fs.mkdir(path.resolve(projectPath,'assets'), {recursive: true}, (err) => {
   if (err) {
@@ -26,6 +18,16 @@ fs.mkdir(path.resolve(projectPath,'assets'), {recursive: true}, (err) => {
   }
 })
 
+deleteFiles(path.resolve(projectPath, 'assets'));
+
+function deleteFiles(pathOfAssets) {
+  fs.readdir(pathOfAssets,{withFileTypes: true}, async (err, files) => {
+    for (let item of files) {
+      await fs.promises.rm(path.resolve(pathOfAssets, item.name),{recursive:true, force: true}, (err) =>{});
+    }
+    copyAssets(assetsPath, path.resolve(projectPath, 'assets'));
+  });
+}
 
 function copyAssets(pathOfAssets, pathOfProjectAssets) {
   fs.readdir(pathOfAssets, {withFileTypes: true}, (err, files) => {
@@ -47,12 +49,6 @@ function copyAssets(pathOfAssets, pathOfProjectAssets) {
     }
   })
 }
-
-fs.mkdir(projectPath,{recursive: true}, (err) => {
-  if (err) {
-    throw new Error(err);
-  }
-});
 
 const styleFileStream = fs.createWriteStream(path.resolve(projectPath, 'style.css'));
 
