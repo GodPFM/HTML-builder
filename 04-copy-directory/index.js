@@ -4,34 +4,43 @@ const path = require('path');
 const pathOfNewFolder = path.resolve(__dirname,'files-copy');
 const pathOfCopyFolder = path.resolve(__dirname, 'files');
 
+deleteFiles(pathOfNewFolder);
+
+function deleteFiles(pathOfAssets) {
+  fs.readdir(pathOfAssets,{withFileTypes: true}, async (err, files) => {
+    for (let item of files) {
+      await fs.promises.rm(path.resolve(pathOfAssets, item.name),{recursive:true, force: true}, (err) =>{});
+    }
+    if (files.length === 0) {
+      fs.rmdir(pathOfAssets, (err) => {})
+    }
+    copyAssets(pathOfCopyFolder, pathOfNewFolder);
+  });
+}
+
 fs.mkdir(pathOfNewFolder,{recursive: true}, (err) => {
   if (err) {
     throw new Error(err);
   }
 });
 
-fs.readdir(pathOfNewFolder, (err, files) => {
-  if (err) {
-    throw new Error(err);
-  }
-  for (let i = 0; i < files.length;i++) {
-    fs.unlink(path.resolve(pathOfNewFolder, files[i]), (err) => {
-      if (err) {
-        throw new Error(err);
+function copyAssets(pathOfAssets, pathOfProjectAssets) {
+  fs.readdir(pathOfAssets, {withFileTypes: true}, (err, files) => {
+    for (let item of files) {
+      if (item.isFile()) {
+        fs.copyFile(path.resolve(pathOfAssets, item.name), path.resolve(pathOfProjectAssets, item.name), (err) => {
+          if (err) {
+            throw new Error(err);
+          }
+        })
+      } else {
+        fs.mkdir(path.resolve(pathOfProjectAssets, item.name),{recursive: true}, (err) => {
+          if (err) {
+            throw new Error(err);
+          }
+        });
+        copyAssets(path.resolve(pathOfAssets, item.name), path.resolve(pathOfProjectAssets, item.name));
       }
-    })
-  }
-})
-
-fs.readdir(pathOfCopyFolder, (err, files) => {
-  if (err) {
-    throw new Error(err);
-  }
-  for (let i = 0; i < files.length;i++) {
-    fs.copyFile(path.resolve(pathOfCopyFolder,files[i]), path.resolve(pathOfNewFolder,files[i]), (err) => {
-      if (err) {
-        throw new Error(err);
-      }
-    })
-  }
-})
+    }
+  })
+}
